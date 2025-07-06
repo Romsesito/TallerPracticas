@@ -1,6 +1,6 @@
-﻿using Best_Practices.Infraestructure.Factories;
-using Best_Practices.Infraestructure.Singletons;
-using Best_Practices.Models;
+﻿using Best_Practices.Models;
+using Best_Practices.Models.ModelBuilder;
+using Best_Practices.Models.ModelFactory;
 using Best_Practices.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
@@ -8,6 +8,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography.Xml;
 using System.Threading.Tasks;
 
 namespace Best_Practices.Controllers
@@ -18,7 +19,7 @@ namespace Best_Practices.Controllers
 
         private readonly IVehicleRepository _vehicleRepository;
 
-        public HomeController(IVehicleRepository vehicleRepository, ILogger<HomeController> logger)
+        public HomeController(IVehicleRepository vehicleRepository,ILogger<HomeController> logger)
         {
             _vehicleRepository = vehicleRepository;
             _logger = logger;
@@ -27,28 +28,58 @@ namespace Best_Practices.Controllers
         public IActionResult Index()
         {
             var model = new HomeViewModel();
-            model.Vehicles = VehicleCollection.Instance.Vehicles;
+            model.Vehicles = _vehicleRepository.GetVehicles();
             string error = Request.Query.ContainsKey("error") ? Request.Query["error"].ToString() : null;
             ViewBag.ErrorMessage = error;
 
             return View(model);
         }
 
+        private CarFactory chooseFactory (string vehicle)
+        {
+            switch (vehicle) {
+                case "Mustang":
+                    return new FordMustangFactory();
+                case "Explorer":
+                    return new FordExplorerFactory();
+                case "Escape":
+                    return new FordEscapeFactory();
+                default:
+                    throw new NotImplementedException();    
+            
+            }
+        }
+
         [HttpGet]
         public IActionResult AddMustang()
         {
-            var factory = new FordMustangCreator();
-            var vehicle = factory.Create();
-            _vehicleRepository.AddVehicle(vehicle);
+
+
+            var carFactory = chooseFactory("Mustang");
+
+            _vehicleRepository.AddVehicle(carFactory.Create());
             return Redirect("/");
         }
 
         [HttpGet]
+        public IActionResult AddEscape()
+        {
+
+            var carFactory = chooseFactory("Escape");
+
+            _vehicleRepository.AddVehicle(carFactory.Create());
+            return Redirect("/");
+        }
+
+
+        [HttpGet]
         public IActionResult AddExplorer()
         {
-            var factory = new FordExplorerCreator();
-            var vehicle = factory.Create();
-            _vehicleRepository.AddVehicle(vehicle);
+
+
+            var carFactory = chooseFactory("Explorer");
+
+            _vehicleRepository.AddVehicle(carFactory.Create());
             return Redirect("/");
         }
 

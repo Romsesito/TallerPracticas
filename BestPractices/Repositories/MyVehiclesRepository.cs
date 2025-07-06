@@ -1,5 +1,4 @@
-﻿using Best_Practices.Infraestructure.Singletons;
-using Best_Practices.Models;
+﻿using Best_Practices.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +8,12 @@ namespace Best_Practices.Repositories
 {
     public class MyVehiclesRepository : IVehicleRepository
     {
-        private readonly VehicleCollection _memoryCollection;
+        private readonly MemoryCollection _memoryCollection = MemoryCollection.Instance;
+
 
         public MyVehiclesRepository()
         {
-            _memoryCollection = VehicleCollection.Instance;
+            // _memoryCollection = new List<Vehicle>();
         }
 
         public void AddVehicle(Vehicle vehicle)

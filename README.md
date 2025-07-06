@@ -1,61 +1,31 @@
-<<<<<<< HEAD
-# TallerPracticas
-a
-=======
-Pepito es un Ingeniero de Software Junior en Codificando Con Patrones Cía. Ltda. Se le ha encargado la tarea de completar los requerimientos funcionales del aplicativo de automóviles al que la empresa da soporte. 
+# Taller de Buenas Prácticas de Programación - Solución
 
-Los requisitos son los siguientes: 
+Este documento describe la solución implementada para el taller de buenas prácticas, abordando los problemas del código inicial mediante el uso de patrones de diseño de software.
 
-- Implementar los métodos de agregar vehículos (add Mustang y add Explorer) en el Home Page. El programador anterior implementó un patrón repositorio que contiene los métodos CRUD para el repositorio de automóviles; sin embargo, el equipo de QA ha reportado que no funciona como se espera. 
- 
+## 1. Identificación de Problemas
 
-- El equipo de base de datos ha comentado que el esquema de la base de datos no está listo. Por lo que se necesita buscar una forma de probar la funcionalidad sin tener que guardar en la base de datos, de tal forma que después se implemente la funcionalidad de base de datos cuando esté lista. 
+Se analizaron los siguientes problemas y restricciones en el escenario propuesto:
 
-- El equipo de negocio ha solicitado agregar el año actual, y 20 propiedades más por defecto que se solicitarán en el siguiente sprint. Estas propiedades afectan a vehículo. Implementa un patrón de diseño para agregar propiedades por defecto, y como lo diseñarías para minimizar los cambios para el siguiente sprint. 
+1.  **Persistencia de Datos:** El `IVehicleRepository` implementado no mantenía el estado de los vehículos entre las diferentes peticiones HTTP. Cada vez que se agregaba un vehículo, la colección se reiniciaba en la siguiente solicitud.
 
-- Se planea agregar un nuevo modelo. El Arquitecto de Software prevee que la unidad de negocio, planeará la introducción de más modelos por lo cual sugiere la implementación de un Factory Method. 
+2.  **Dependencia de la Base de Datos:** El desarrollo estaba bloqueado por la ausencia de un esquema de base de datos. Se requería una solución de almacenamiento temporal que permitiera el desarrollo y las pruebas, y que pudiera ser reemplazada fácilmente por una implementación de base de datos real.
+3.  **Creación de Objetos Complejos:** La solicitud de negocio de agregar el año actual y más de 20 propiedades futuras al objeto `Vehicle` haría que el constructor de la clase `Car` fuera extremadamente grande y difícil de manejar, violando los principios de código limpio.
+4.  **Extensibilidad para Nuevos Modelos:** El sistema necesitaba una forma flexible y escalable de agregar nuevos modelos de vehículos (como el Ford Escape) sin tener que modificar el código existente que consume estos objetos, evitando así múltiples sentencias `if` o `switch` en el controlador.
 
-  - Color: Red 
+---
 
-  - Marca: Ford 
+## 2. Metodologías y Patrones de Diseño Seleccionados
 
-  - Modelo: Escape 
+Para solucionar los problemas identificados, se seleccionaron e implementaron los siguientes patrones de diseño:
 
- 
+### a. Patrón Singleton 
 
- 
+Para resolver estos problemas, utilicé el patrón Singleton en la clase MemoryCollection. Este patrón asegura que exista una única instancia de la colección de vehículos en toda la aplicación. De esta manera, todos los controladores y repositorios acceden a la misma lista de objetos, simulando una capa de persistencia de datos que mantiene su estado durante el ciclo de vida de la aplicación. Esto desacopla la lógica de negocio de la implementación de la base de datos, permitiendo un fácil reemplazo en el futuro.
 
-Como primera parte del taller los alumnos tendrán: 
+### b. Patrón Builder 
 
-Que analizar el código propuesto y deberán identificar que mejores prácticas, patrón o patrones se puede implementar para mejorar la solución. 
+Se implemento el patrón Builder con la clase CarModelBuilder. Este patrón es ideal para construir objetos complejos paso a paso. Me permite establecer valores por defecto (como brand="Ford" o year=DateTime.Now.Year) y solo especificar las propiedades que cambian.
 
-Segundo deberán presentar en un documento explicativo de las mejores prácticas con el diseño UML del patrón o patrones a implementar y justificar el motivo de la propuesta. 
+### c. Patrón Factory Method 
 
- Y finalmente los alumnos procederán a clonar el repositorio base e implementar el patrón o los patrones propuestos en la una versión online (código debe tener comentarios) 
-
- 
-
-FORMA DE TRABAJO: 
-
-Establezca grupos de trabajo de máximo 2 integrantes. 
-
- 
-
-ESPECIFICACIONES DE ENTREGA: 
-
-Documento técnico que contiene los siguientes puntos: 
-
-Identifica el problema dentro de las restricciones del proyecto: 	Describir los problemas encontrados en el escenario propuesto por el docente de una manera técnica identificando de manera correcta las limitaciones y restricciones. 
-
-Selecciona metodologías integrales para solucionar el problema: En el documento técnico explicar los patrones que seleccionan y justarlos de manera técnica  
-
- 
-
-Diseña una propuesta técnica para el problema considerando los recursos y restricciones del proyecto: 
-
-Prototipo de la solución aplicado el patrón de diseño, compartido en GIT 
-
- 
-
- 
->>>>>>> master
+Se utilizo el patrón Factory Method. Este patrón es como tener diferentes máquinas especializadas que saben cómo construir cada tipo de auto. En lugar de que el programa principal sepa todos los detalles de cómo se hace un Mustang, un Explorer o un Escape, simplemente le pedimos a la factory correspondiente que lo cree. Esto significa que si en el futuro necesito añadir un nuevo modelo de auto, solo tengo que crear una nueva factory con el modelo de ese auto
