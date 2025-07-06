@@ -2,6 +2,9 @@
 
 Este documento describe la solución implementada para el taller de buenas prácticas, abordando los problemas del código inicial mediante el uso de patrones de diseño de software.
 
+![image](https://github.com/user-attachments/assets/98fb8e1f-e204-4847-a4e0-f473b375f8b2)
+
+
 ## 1. Identificación de Problemas
 
 Se analizaron los siguientes problemas y restricciones en el escenario propuesto:
